@@ -8,10 +8,11 @@ Heaps.  Implementing and sorting
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
+#include <cmath>
 
 using namespace std;
 
-int arrLength = 10;
+int arrLength = 100;
 
 void swap(int *i, int *j)
 {
@@ -20,56 +21,53 @@ void swap(int *i, int *j)
     *j = temp;
 }
 
-void sink(int array [], int parent, int sizeOfArray)
+void sink(int array [], int start, int end)
 {
-    int leftChild, rightChild;
-    leftChild = 2 * parent + 1;
-    if(leftChild >= sizeOfArray || parent < 0)
+    int root = start;
+    while (root * 2 + 1 <= end)
     {
-        return;
-    }
-    rightChild = leftChild + 1;
-    
-    if(rightChild < arrLength && array[rightChild] >= array[parent])
-    {
-        swap(&array[rightChild], &array[parent]);
-    }
-    
-    if(array[leftChild] >= array[parent])
-    {
-        swap(&array[leftChild], &array[parent]);   
-    }
-    
-    parent--;
-    sink(array, parent, sizeOfArray);
-}
-
-void heapify(int array [], int sizee)
-{
-    for(int i = arrLength / 2 ; i >= 1; i--)
-    {
-        sink(array, i, sizee);
+        int child = root * 2 + 1;
+        int swapper = root;
+        if(array[swapper] < array[child])
+        {
+            swapper = child;
+        }
+        if(child + 1 <= end && array[swapper] < array[child + 1])
+        {
+            swapper = child + 1;
+        }
+        if(swapper == root)
+        {
+            return;
+        }
+        else
+        {
+            swap(array[root], array[swapper]);
+            root = swapper;
+        }
     }
 }
 
-void heapsort(int array [])
+void heapify(int array [], int count)
 {
-    for(int i = 1; i < arrLength; i++)
+    int start = floor((count - 2) / 2);
+    while (start >= 0)
     {
-        heapify(array, (arrLength - i));
-        cout << "Heap" << endl;
-        for(int j = 0; j < arrLength; j++)
-        {
-            cout << array[j] << endl;
-        }
-        swap(&array[0], &array[arrLength - i]);
-        cout << "After Switch" << endl;
-        for(int j = 0; j < arrLength; j++)
-        {
-            cout << array[j] << endl;
-        }
+        sink(array, start, count - 1);
+        start--;
     }
-    cout << "ran" << endl;
+}
+
+void heapsort(int array [], int count)
+{
+    heapify(array, count);
+    int end = count - 1;
+    while (end > 0)
+    {
+        swap(&array[end], &array[0]);
+        end--;
+        sink(array, 0, end);
+    }
 }
 
 int main()
@@ -78,11 +76,11 @@ int main()
     int arr [arrLength];
     for(int i = 0; i < arrLength; i++)
     {
-        arr[i] = (rand() % 20);
+        arr[i] = (rand() % (arrLength * 3));
         cout << arr[i] << endl;
     }
     cout << "Array Made" << endl << endl;
-    heapsort(arr);
+    heapsort(arr, arrLength);
     cout << "Sorted list:" << endl;
     for(int i = 0; i < arrLength; i++)
     {
